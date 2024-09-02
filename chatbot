@@ -1,0 +1,162 @@
+import discord
+import random
+import time 
+import os
+import requests
+from discord.ext import commands
+from settings import settings
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hola, soy un bot {bot.user}!')
+
+@bot.command()
+async def heh(ctx, count_heh = 5):
+    await ctx.send("he" * count_heh)
+
+@bot.command()
+async def mem(ctx):
+    with open('images/mem2.jpg', 'rb') as f:
+        # ¡Vamos a almacenar el archivo de la biblioteca Discord convertido en esta variable!
+        picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture)
+
+@bot.command()
+async def mem1(ctx):
+    images = os.listdir('images')
+# ¡Y así es como se puede sustituir el nombre del fichero desde una variable!
+    with open(f'images/{random.choice(images)}', 'rb') as f:
+        picture = discord.File(f)
+    await ctx.send(file=picture)
+
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+@bot.command('duck')
+async def duck(ctx):
+    '''Una vez que llamamos al comando duck, 
+    el programa llama a la función get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
+
+def get_dog_image_url():    
+    url = 'https://random.dog/woof.json'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+@bot.command('dog')
+async def dog(ctx):
+    '''Una vez que llamamos al comando dog, 
+    el programa llama a la función get_dog_image_url'''
+    image_url = get_dog_image_url()
+    await ctx.send(image_url)
+
+def get_fox_image_link():    
+    link = 'https://randomfox.ca/floof/'
+    res = requests.get(link)
+    data = res.json()
+    return data['image']
+
+@bot.command('fox')
+async def fox(ctx):
+    '''Una vez que llamamos al comando fox, 
+    el programa llama a la función get_fox_image_url'''
+    image_link= get_fox_image_link()
+    await ctx.send(image_link)
+
+@bot.command()
+async def add(ctx, left: int, right: int):
+    """Adds two numbers together."""
+    await ctx.send(left + right)
+    
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    """Says when a member joined."""
+    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
+
+@bot.command(description='For when you wanna settle the score some other way')
+async def choose(ctx, *choices: str):
+    """Chooses between multiple choices."""
+    await ctx.send(random.choice(choices))
+
+
+@bot.command()
+async def contaminacion(ctx):
+    await ctx.send(f"""Hola, soy un bot {bot.user}!""")# esta linea saluda
+    await ctx.send(f'Te voy hablar un poco sobre la contaminacion')
+    await ctx.send(f'La contaminación es un gran problema a nivel mundial, muchos paises sufren a diario')
+    # Enviar una pregunta al usuario
+    await ctx.send("Quieres consejos sobre cómo combatir la contaminación? Responde con 'sí' o 'no'.")
+# Esperar la respuesta del usuario
+    def check(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content in ['sí', 'si', 'no']
+    response = await bot.wait_for('message', check=check)
+    if response:
+        if response.content in ['sí', 'si']:
+            await ctx.send("1. No arrojar basura en los rios")
+            await ctx.send("2. Dejar de quemar basuras")   
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas consejos, no dudes en preguntar.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+    await ctx.send("Quieres saber la definicion de contaminacion, responde si o no")
+    response1 = await bot.wait_for('message', check=check)
+    if response1:
+        if response1.content in ['sí', 'si']:
+            await ctx.send("Arrojar basura") 
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas consejos, no dudes en preguntar.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+        
+@bot.command()
+async def peliculas(ctx):
+    await ctx.send(f"Hola, soy un bot {bot.user}!")  # esta línea saluda
+    time.sleep(1)
+    await ctx.send("Te voy a hablar un poco sobre las películas.")
+    time.sleep(1)
+    await ctx.send("Las películas son una forma de entretenimiento y de pasar un buen rato, con amigos, familia, etc.")
+    # Enviar una pregunta al usuario
+    await ctx.send("¿Quieres que te recomiende una película? Responde con 'sí' o 'no'.")
+
+    # Esperar la respuesta del usuario
+    def check2(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content.lower() in ['sí', 'si', 'no']
+
+    response2 = await bot.wait_for('message', check=check2)
+    if response2:
+        if response2.content.lower() in ['sí', 'si']:
+            await ctx.send("Interestelar - Ciencia ficción")
+            await ctx.send("La vida es bella - Drama")
+            await ctx.send("Son como niños - Comedia")
+            await ctx.send("El resplandor - Terror")
+            await ctx.send("Coco - Animación")
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas alguna recomendación, no dudes en preguntar.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+
+    await ctx.send("¿Quieres saber dónde ver películas? Responde 'sí' o 'no'.")
+    response3 = await bot.wait_for('message', check=check2)
+    if response3:
+        if response3.content.lower() in ['sí', 'si']:
+            await ctx.send("Netflix, Amazon Prime Video, HBO Max, Disney+, YouTube, Paramount+, etc.")
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas saber dónde, no dudes en preguntar.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+
+bot.run(settings["TOKEN"])
